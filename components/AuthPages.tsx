@@ -66,7 +66,7 @@ function AuthPages() {
 
   const handleForgotPassword = () => {
     // Show a message or modal for contacting IIPC members
-    alert('Please contact the IIPC members for assistance with password recovery.');
+    alert('Please contact the Authorities for assistance with password recovery.');
   };
 
   return (
@@ -78,7 +78,7 @@ function AuthPages() {
             alt="Bannari Amman Institute of Technology"
             className="mx-auto mb-4 w-28 h-28"
           />
-          <h2 className="text-3xl font-bold mb-4">IIPC BIT</h2>
+          <h2 className="text-3xl font-bold mb-4">MAPS BIT</h2>
         </div>
         {!showLogin ? (
           <div className="flex flex-col items-center">
