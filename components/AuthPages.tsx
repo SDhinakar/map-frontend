@@ -65,7 +65,7 @@ function AuthPages() {
   };
 
   const handleForgotPassword = () => {
-    // Show a message or modal for contacting IIPC members
+    // Show a message or modal for contacting Authorities
     alert('Please contact the Authorities for assistance with password recovery.');
   };
 
