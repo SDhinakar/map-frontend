@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +22,10 @@ interface Route {
   path: string;
 }
 
+interface CampusMapProps {
+  locations: Location[]; // Define the locations prop
+}
+
 const locationIcons = {
   building: Building,
   library: Book,
@@ -30,72 +34,15 @@ const locationIcons = {
   hostel: Home,
 };
 
-// const API_URL = "http://localhost:5000"; // Replace with your backend URL
-
-export default function CampusMap() {
-  const [locations, setLocations] = useState<Location[]>([]);
+export default function CampusMap({ locations }: CampusMapProps) {
   const [isAddingLocation, setIsAddingLocation] = useState(false);
   const [fromLocation, setFromLocation] = useState<string>("");
   const [toLocation, setToLocation] = useState<string>("");
   const [highlightedRoute, setHighlightedRoute] = useState<Route | null>(null);
   const [searchLocation, setSearchLocation] = useState<string>("");
   const [foundLocation, setFoundLocation] = useState<Location | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
-
-  // Fetch locations for the logged-in user
-  useEffect(() => {
-    const fetchUserLocations = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setError("No token found");
-          return;
-        }
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/location/`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        const data = await response.json();
-        console.log("Fetched Locations:", data);
-
-        if (response.ok) {
-          if (Array.isArray(data.locations)) {
-            setLocations(
-              data.locations
-                .filter((loc: any) => loc._id || loc.id)
-                .map((loc: any) => ({
-                  id: loc._id || loc.id || "",
-                  name: loc.name,
-                  x: loc.x,
-                  y: loc.y,
-                  type: loc.type,
-                }))
-            );
-          } else {
-            setError("Invalid data structure received");
-          }
-        } else {
-          setError(data.message || "Failed to fetch locations");
-        }
-      } catch (error) {
-        setError("Failed to fetch locations");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserLocations();
-  }, []);
 
   // Memoized routes calculation
   const routes = useMemo(() => {
@@ -163,7 +110,7 @@ export default function CampusMap() {
       console.log("Backend Response:", data);
 
       if (response.ok) {
-        setLocations([...locations, data.location]);
+        // Update the parent component's state to include the new location
         setError(null); // Clear any previous errors
       } else {
         setError(data.message || "Failed to add location");
@@ -208,8 +155,7 @@ export default function CampusMap() {
 
   return (
     <div className="flex flex-col items-center space-y-6 w-full max-w-3xl mx-auto">
-      {/* Loading and Error Messages */}
-      {loading && <p>Loading...</p>}
+      {/* Error Messages */}
       {error && (
         <motion.div
           className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg shadow"
