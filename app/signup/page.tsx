@@ -1,20 +1,24 @@
-"use client"
+"use client";
 
 import { useState } from 'react';
 import logo from '../../assets/logo.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { API_URL } from '@/networking';
+import Link from 'next/link';
 
-function SignupPage() {
+export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
@@ -27,12 +31,14 @@ function SignupPage() {
 
       const data = await response.json();
       if (response.ok) {
-        router.push('/'); // Redirect to login page after successful signup
+        router.push('/login'); // Redirect to login page after successful signup
       } else {
         setError(data.message || 'Signup failed');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,6 +69,7 @@ function SignupPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-3 py-2 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
           <div className="mb-4">
@@ -75,6 +82,7 @@ function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
           <div className="mb-4">
@@ -87,18 +95,25 @@ function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-3 rounded-lg shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            disabled={loading}
+            className="w-full bg-green-500 text-white py-3 rounded-lg shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"
           >
-            Sign Up
+            {loading ? 'Signing up...' : 'Sign Up'}
           </button>
         </form>
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">Already have an account?{' '}
+            <Link href="/login" className="text-blue-500 hover:underline">
+              Log In
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 }
-
-export default SignupPage;

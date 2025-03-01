@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from 'react';
 import logo from '../assets/logo.png';
@@ -13,12 +13,14 @@ function AuthPages() {
   const [name, setName] = useState(''); // For signup
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [forgotPassword, setForgotPassword] = useState(false); // State to manage forgot password
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
-  const handleSignup = async (e: any) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
@@ -37,11 +39,15 @@ function AuthPages() {
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -54,13 +60,15 @@ function AuthPages() {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.userId);
-        router.push('/'); // Redirect to dashboard after successful login
+        localStorage.setItem('token', data.token); // Save the token
+        router.push('/'); // Redirect to home page after successful login
       } else {
         setError(data.message || 'Login failed');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,6 +120,7 @@ function AuthPages() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
             </div>
             <div className="mb-4">
@@ -124,6 +133,7 @@ function AuthPages() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
             </div>
             <div className="flex items-center justify-between mb-4">
@@ -145,9 +155,10 @@ function AuthPages() {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white py-3 rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+              className="w-full bg-blue-500 text-white py-3 rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
         )}
