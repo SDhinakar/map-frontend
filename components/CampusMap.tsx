@@ -30,7 +30,7 @@ const locationIcons = {
   hostel: Home,
 };
 
-const API_URL = "http://localhost:5000"; // Replace with your backend URL
+// const API_URL = "http://localhost:5000"; // Replace with your backend URL
 
 export default function CampusMap() {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -57,7 +57,7 @@ export default function CampusMap() {
           return;
         }
 
-        const response = await fetch(`${API_URL}/api/location/`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/location/`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -100,12 +100,13 @@ export default function CampusMap() {
   // Memoized routes calculation
   const routes = useMemo(() => {
     const newRoutes: Route[] = [];
+    let routeIdCounter = 1; // Counter to generate unique numeric IDs
     for (let i = 0; i < locations.length; i++) {
       for (let j = i + 1; j < locations.length; j++) {
         const from = locations[i];
         const to = locations[j];
         newRoutes.push({
-          id: newRoutes.length + 1,
+          id: routeIdCounter++, // Increment the counter for each route
           from: from.id,
           to: to.id,
           path: `M${from.x},${from.y} L${to.x},${to.y}`,
@@ -149,7 +150,7 @@ export default function CampusMap() {
         return;
       }
 
-      const response = await fetch(`${API_URL}/api/location/add`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/location/add`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
